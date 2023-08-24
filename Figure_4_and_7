@@ -1,0 +1,31 @@
+#Figure 4 and 7 for Reducing Systematic Uncertainty in Computed Redox Potentials for Aqueous Transition-Metal-Substituted Polyoxotungstates 
+#doi: 10.1021/acs.inorgchem.3c01115
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+#read_file
+
+df=pd.read_csv(r'C:\Users\2586376t\Documents-PGR\Research\Properties-of-MPOMs\conda\Python-Scripts\H2O-Bound\Electronic\Reduction-Energies\Book1.csv')
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.scatter(df.x, df.y,1000, marker="_", color="red", label='Comp. Redox Potential / V vs SHE')
+ax1.scatter(df.x, df.a, 1000, marker="_",  color="black", label='Exp. Redox Potential / V vs SHE')
+ax1.set_ylabel('Redox Potential / V vs SHE')
+ax1.set_ylim(-0.15,1.45)
+
+
+#draws_lines
+
+for i in df.x:
+	plt.vlines(x = df.x[i-1], ymin = df.y[i-1] , ymax = df.a[i-1], colors = 'black')
+
+
+plt.legend(edgecolor='white', fontsize=14)
+
+
+plt.savefig('Figure_7.svg')
+plt.savefig('Figure_7.pdf')
+
+plt.show()
