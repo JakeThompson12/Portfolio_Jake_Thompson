@@ -1,0 +1,82 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Function to remove rows with null values
+def remove_null_rows(dataframe):
+    return dataframe.dropna()
+
+# Load the data into a DataFrame
+df = pd.read_csv(r"C:\Users\2586376t\Documents-PGR\Research\Properties-of-MPOMs\conda\Python-Scripts\H2O-Bound\CV-Paper\distance\Distances-Null.csv")
+
+# Remove rows with null values
+df = remove_null_rows(df)
+
+# Create a dictionary to map metals to colors
+metal_to_color_map = {
+    "Mn": "steelblue",
+    "Fe": "darkseagreen",
+    "Co": "palevioletred",
+}
+
+# Create a figure with 3 subplots
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+# Get the unique X values
+unique_x_values = df['X'].unique()
+
+# Iterate over the unique X values and create a subplot for each one
+for i, x_value in enumerate(unique_x_values):
+
+    # Filter the DataFrame to only include rows with the current X value
+    filtered_df = df[df['X'] == x_value]
+
+    # Create a subplot
+    ax = axes[i]
+
+    # Get the metal for each row in the filtered DataFrame
+    metals = filtered_df['metal']
+
+    # Get the colors for each row in the filtered DataFrame
+    colors = [metal_to_color_map[metal] for metal in metals]
+
+    # Plot the data points and add labels for the legend
+    for metal, color in metal_to_color_map.items():
+        ax.scatter(filtered_df[filtered_df['metal'] == metal]['HF'], filtered_df[filtered_df['metal'] == metal]['D'], c=color, edgecolor='black', label=metal)
+
+    # Perform linear regression
+    model = LinearRegression()
+    X = filtered_df[['HF']]
+    y = filtered_df['D']
+    model.fit(X, y)
+    y_pred = model.predict(X)
+
+    # Plot the linear regression line
+    ax.plot(X['HF'], y_pred, color='black', linewidth=2)
+
+    # Calculate R2 value
+    r2 = r2_score(y, y_pred)
+
+    # Get the coefficients of the linear regression model
+    slope = model.coef_[0]
+    intercept = model.intercept_
+
+    # Create the equation string
+    equation = f'y = {slope:.2f}x + {intercept:.2f}\nR2 = {r2:.2f}'
+
+    # Add the equation as text on the subplot (left middle)
+    ax.text(0.05, 0.05, equation, transform=ax.transAxes, fontsize=12)
+
+    # Set the title and labels of the subplot
+    ax.set_xlabel('Hartree-Fock / %')
+    ax.set_ylabel('Distance / Å')
+
+    # Create a legend
+    ax.legend(edgecolor='white')
+
+# Adjust the layout of the subplots
+plt.tight_layout()
+plt.savefig(r"C:\Users\2586376t\Documents-PGR\Research\Properties-of-MPOMs\conda\Python-Scripts\H2O-Bound\CV-Paper\distance\Figure.svg")
+# Show the plot
+plt.show()
